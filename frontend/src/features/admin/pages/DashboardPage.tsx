@@ -27,21 +27,21 @@ interface StatCardProps {
 }
 
 const StatCard = ({ title, value, icon, iconBg, iconColor }: StatCardProps) => (
-  <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
+  <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
     <div className={`p-3 rounded-lg ${iconBg} ${iconColor}`}>{icon}</div>
     <div>
-      <p className="text-sm text-slate-500">{title}</p>
-      <p className="text-2xl font-bold text-slate-900">{value}</p>
+      <p className="text-sm text-slate-500 dark:text-slate-400">{title}</p>
+      <p className="text-2xl font-bold text-slate-900 dark:text-slate-100">{value}</p>
     </div>
   </div>
 );
 
 const StatCardSkeleton = () => (
-  <div className="animate-pulse bg-white rounded-lg shadow-sm border border-slate-200 p-6 flex items-center gap-4">
-    <div className="h-12 w-12 rounded-lg bg-slate-200" />
+  <div className="animate-pulse bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6 flex items-center gap-4">
+    <div className="h-12 w-12 rounded-lg bg-slate-200 dark:bg-slate-700" />
     <div className="flex-1 space-y-2">
-      <div className="h-3 bg-slate-200 rounded w-1/2" />
-      <div className="h-6 bg-slate-200 rounded w-1/3" />
+      <div className="h-3 bg-slate-200 dark:bg-slate-700 rounded w-1/2" />
+      <div className="h-6 bg-slate-200 dark:bg-slate-700 rounded w-1/3" />
     </div>
   </div>
 );
@@ -156,14 +156,14 @@ const DashboardPage = () => {
   const totalPieValue = pieData.reduce((sum, slice) => sum + slice.value, 0);
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-[#0f172a]">Dashboard</h1>
-          <p className="text-slate-600 mt-1 text-sm">System overview and key metrics</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Dashboard</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">System overview and key metrics</p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
           ) : (
@@ -172,57 +172,59 @@ const DashboardPage = () => {
                 title="Total Books"
                 value={data?.totalBooks ?? 0}
                 icon={<BookIcon />}
-                iconBg="bg-indigo-100"
-                iconColor="text-indigo-600"
+                iconBg="bg-indigo-100 dark:bg-indigo-900/40"
+                iconColor="text-indigo-600 dark:text-indigo-300"
               />
               <StatCard
                 title="Available Books"
                 value={data?.availableBooks ?? 0}
                 icon={<CheckCircleIcon />}
-                iconBg="bg-green-100"
-                iconColor="text-green-600"
+                iconBg="bg-green-100 dark:bg-green-900/40"
+                iconColor="text-green-600 dark:text-green-300"
               />
               <StatCard
                 title="Borrowed Books"
                 value={data?.borrowedBooks ?? 0}
                 icon={<BookmarkIcon />}
-                iconBg="bg-amber-100"
-                iconColor="text-amber-600"
+                iconBg="bg-amber-100 dark:bg-amber-900/40"
+                iconColor="text-amber-600 dark:text-amber-300"
               />
               <StatCard
                 title="Total Users"
                 value={data?.totalUsers ?? 0}
                 icon={<UsersIcon />}
-                iconBg="bg-purple-100"
-                iconColor="text-purple-600"
+                iconBg="bg-purple-100 dark:bg-purple-900/40"
+                iconColor="text-purple-600 dark:text-purple-300"
               />
             </>
           )}
         </div>
 
         {statsError && !loading && (
-          <p className="mt-3 text-xs text-slate-500 italic">
+          <p className="mt-3 text-xs text-slate-500 dark:text-slate-400 italic">
             Dashboard stats unavailable (GET /api/admin/dashboard). Showing zeros.
           </p>
         )}
 
         <div className="mt-8 grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h3 className="text-base font-semibold text-[#0f172a]">Borrow Activity — Last 6 Months</h3>
-            <p className="text-sm text-slate-500 mt-0.5 mb-4">Borrow records grouped by month</p>
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+              Borrow Activity — Last 6 Months
+            </h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 mb-4">Borrow records grouped by month</p>
             <div style={{ width: '100%', height: 280 }}>
               {chartsLoading ? (
-                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500">
+                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
                   Loading chart…
                 </div>
               ) : borrowsError ? (
-                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500">
+                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
                   Chart data unavailable.
                 </div>
               ) : (
                 <ResponsiveContainer>
                   <BarChart data={monthlyData} margin={{ top: 10, right: 10, bottom: 0, left: -10 }}>
-                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} />
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e2e8f0" vertical={false} className="dark:stroke-slate-700" />
                     <XAxis
                       dataKey="month"
                       tick={{ fill: '#64748b', fontSize: 12 }}
@@ -246,16 +248,16 @@ const DashboardPage = () => {
             </div>
           </div>
 
-          <div className="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
-            <h3 className="text-base font-semibold text-[#0f172a]">Book Status Distribution</h3>
-            <p className="text-sm text-slate-500 mt-0.5 mb-4">Available vs borrowed copies</p>
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 p-6">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Book Status Distribution</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5 mb-4">Available vs borrowed copies</p>
             <div style={{ width: '100%', height: 280 }}>
               {loading ? (
-                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500">
+                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
                   Loading chart…
                 </div>
               ) : totalPieValue === 0 ? (
-                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500">
+                <div className="h-full w-full flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
                   No book data yet.
                 </div>
               ) : (

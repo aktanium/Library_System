@@ -73,13 +73,13 @@ const Feature = ({
   iconColor: string;
 }) => (
   <div
-    className={`bg-white border-t-4 ${borderColor} border-x border-b border-slate-200 shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow`}
+    className={`bg-white dark:bg-slate-800 border-t-4 ${borderColor} border-x border-b border-slate-200 dark:border-slate-700 shadow-sm rounded-lg p-6 hover:shadow-md transition-shadow`}
   >
     <div className={`inline-flex items-center justify-center w-12 h-12 rounded-lg ${iconBg} ${iconColor} mb-4`}>
       {icon}
     </div>
-    <h3 className="text-lg font-semibold text-[#0f172a]">{title}</h3>
-    <p className="mt-2 text-sm text-slate-600">{description}</p>
+    <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">{title}</h3>
+    <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{description}</p>
   </div>
 );
 
@@ -111,21 +111,48 @@ const ChartIcon = () => (
   </svg>
 );
 
+const features = [
+  {
+    icon: <BookIcon />,
+    title: 'Book Catalog',
+    description: 'Search and browse our complete collection by title, author, or genre.',
+    borderColor: 'border-t-[#2563eb]',
+    iconBg: 'bg-blue-50 dark:bg-blue-950',
+    iconColor: 'text-[#2563eb]',
+  },
+  {
+    icon: <BoltIcon />,
+    title: 'Instant Borrowing',
+    description: 'Reserve any available book instantly with one click.',
+    borderColor: 'border-t-[#16a34a]',
+    iconBg: 'bg-green-50 dark:bg-green-950',
+    iconColor: 'text-[#16a34a]',
+  },
+  {
+    icon: <ChartIcon />,
+    title: 'Borrow Tracking',
+    description: 'Track your active borrows, due dates, and complete history.',
+    borderColor: 'border-t-[#7c3aed]',
+    iconBg: 'bg-purple-50 dark:bg-purple-950',
+    iconColor: 'text-[#7c3aed]',
+  },
+];
+
 const HomePage = () => {
   const { isAuthenticated } = useAuth();
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-20">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
               University Thesis Project
             </span>
-            <h1 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-bold text-[#0f172a] tracking-tight">
+            <h1 className="mt-5 text-3xl sm:text-4xl lg:text-5xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
               Library Management System
             </h1>
-            <p className="mt-5 text-lg text-slate-600 max-w-xl">
+            <p className="mt-5 text-lg text-slate-600 dark:text-slate-300 max-w-xl">
               A clean, reliable platform for managing books, members, and borrowing records across your library.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -138,7 +165,7 @@ const HomePage = () => {
               {!isAuthenticated && (
                 <Link
                   to="/login"
-                  className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-[#2563eb] bg-white border border-[#2563eb] hover:bg-blue-50 transition-colors"
+                  className="inline-flex items-center px-5 py-2.5 rounded-lg text-sm font-semibold text-[#2563eb] dark:text-blue-300 bg-white dark:bg-slate-800 border border-[#2563eb] dark:border-blue-500 hover:bg-blue-50 dark:hover:bg-slate-700 transition-colors"
                 >
                   Sign In
                 </Link>
@@ -151,20 +178,20 @@ const HomePage = () => {
         </div>
       </section>
 
-      <section className="bg-slate-800">
+      <section className="bg-slate-800 dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-1 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/15 text-center">
             <div className="py-4 sm:py-0">
-              <p className="text-3xl sm:text-4xl font-bold text-white">500+</p>
+              <p className="text-3xl sm:text-4xl font-bold text-white">20+</p>
               <p className="mt-1 text-sm uppercase tracking-wider text-slate-400">Books</p>
             </div>
             <div className="py-4 sm:py-0">
               <p className="text-3xl sm:text-4xl font-bold text-white">50+</p>
-              <p className="mt-1 text-sm uppercase tracking-wider text-slate-400">Members</p>
+              <p className="mt-1 text-sm uppercase tracking-wider text-slate-400">Active Members</p>
             </div>
             <div className="py-4 sm:py-0">
               <p className="text-3xl sm:text-4xl font-bold text-white">1000+</p>
-              <p className="mt-1 text-sm uppercase tracking-wider text-slate-400">Borrows</p>
+              <p className="mt-1 text-sm uppercase tracking-wider text-slate-400">Daily Borrows</p>
             </div>
           </div>
         </div>
@@ -172,40 +199,21 @@ const HomePage = () => {
 
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="text-center max-w-2xl mx-auto mb-10">
-          <h2 className="text-2xl sm:text-3xl font-bold text-[#0f172a]">Everything your library needs</h2>
-          <p className="mt-3 text-slate-600">
+          <h2 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-slate-100">
+            Everything your library needs
+          </h2>
+          <p className="mt-3 text-slate-600 dark:text-slate-400">
             Powerful tools for both readers and administrators, built on a clean, modern stack.
           </p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <Feature
-            icon={<BookIcon />}
-            title="Book Catalog"
-            description="Search and browse our complete collection by title, author, or genre."
-            borderColor="border-t-[#2563eb]"
-            iconBg="bg-blue-50"
-            iconColor="text-[#2563eb]"
-          />
-          <Feature
-            icon={<BoltIcon />}
-            title="Instant Borrowing"
-            description="Reserve any available book instantly with one click."
-            borderColor="border-t-[#16a34a]"
-            iconBg="bg-green-50"
-            iconColor="text-[#16a34a]"
-          />
-          <Feature
-            icon={<ChartIcon />}
-            title="Borrow Tracking"
-            description="Track your active borrows, due dates, and complete history."
-            borderColor="border-t-[#7c3aed]"
-            iconBg="bg-purple-50"
-            iconColor="text-[#7c3aed]"
-          />
+          {features.map((f) => (
+            <Feature key={f.title} {...f} />
+          ))}
         </div>
       </section>
 
-      <section className="bg-[#1e3a5f]">
+      <section className="bg-[#1e3a5f] dark:bg-slate-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 text-center">
           <h2 className="text-2xl sm:text-3xl font-bold text-white">Ready to get started?</h2>
           <p className="mt-3 text-slate-300">Sign in to your account and explore the catalog.</p>

@@ -85,8 +85,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50 flex">
-      <div className="hidden lg:flex lg:w-1/2 bg-[#1e3a5f] text-white p-12 flex-col justify-between">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900 flex">
+      <div className="hidden lg:flex lg:w-1/2 bg-[#1e3a5f] dark:bg-slate-950 text-white p-12 flex-col justify-between">
         <div>
           <div className="flex items-center gap-3">
             <span className="text-xl font-bold tracking-tight">LibraryMS</span>
@@ -100,9 +100,9 @@ const LoginPage = () => {
             A clean, professional platform for cataloging books, tracking borrows, and managing members.
           </p>
           <ul className="mt-10 space-y-3 text-sm text-slate-200">
-            <li className="flex items-start"><CheckIcon /> Centralized book catalog with live search</li>
-            <li className="flex items-start"><CheckIcon /> Borrow and return workflow in one click</li>
-            <li className="flex items-start"><CheckIcon /> Admin dashboard with usage analytics</li>
+            <li className="flex items-start"><CheckIcon /> Browse 20+ books with live search</li>
+            <li className="flex items-start"><CheckIcon /> Instant borrowing in one click</li>
+            <li className="flex items-start"><CheckIcon /> Track your complete history</li>
           </ul>
         </div>
         <p className="text-xs text-slate-400">© 2026 University Thesis Project</p>
@@ -111,19 +111,22 @@ const LoginPage = () => {
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-12">
         <div className="w-full max-w-md">
           <div className="mb-8">
-            <h2 className="text-2xl font-bold text-[#0f172a]">Welcome back</h2>
-            <p className="mt-1 text-sm text-slate-600">Sign in to continue</p>
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Welcome back</h2>
+            <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">Sign in to continue</p>
           </div>
 
           {error && (
-            <div className="mb-4 bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm" role="alert">
+            <div
+              className="mb-4 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-300 rounded-lg px-4 py-3 text-sm"
+              role="alert"
+            >
               {error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Email
               </label>
               <div className="relative">
@@ -138,13 +141,13 @@ const LoginPage = () => {
                   placeholder="you@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 border border-slate-200 rounded-lg py-2.5 w-full focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
+                  className="pl-10 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg py-2.5 w-full focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
                 />
               </div>
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700 mb-1">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
                 Password
               </label>
               <div className="relative">
@@ -159,13 +162,13 @@ const LoginPage = () => {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 border border-slate-200 rounded-lg py-2.5 w-full focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
+                  className="pl-10 pr-10 border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-lg py-2.5 w-full focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword((s) => !s)}
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                 >
                   <EyeIcon off={showPassword} />
                 </button>
@@ -182,9 +185,9 @@ const LoginPage = () => {
             </button>
           </form>
 
-          <p className="mt-6 text-center text-sm text-slate-600">
+          <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
             Don&apos;t have an account?{' '}
-            <Link to="/register" className="font-semibold text-[#2563eb] hover:text-blue-700">
+            <Link to="/register" className="font-semibold text-[#2563eb] hover:text-blue-700 dark:text-blue-400">
               Register →
             </Link>
           </p>

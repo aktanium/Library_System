@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
+import { useTheme } from '../../context/ThemeContext';
 
 const decodePayload = (): { sub?: string; role?: string } | null => {
   try {
@@ -42,8 +43,31 @@ const HamburgerIcon = ({ open }: { open: boolean }) => (
   </svg>
 );
 
+const SunIcon = () => (
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+    />
+  </svg>
+);
+
+const MoonIcon = () => (
+  <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"
+    />
+  </svg>
+);
+
 const Navbar = () => {
   const { isAuthenticated, isAdmin, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -83,6 +107,18 @@ const Navbar = () => {
     </>
   );
 
+  const themeToggle = (
+    <button
+      type="button"
+      onClick={toggleTheme}
+      aria-label={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="text-white p-2 rounded-lg hover:bg-white/10 transition-colors"
+    >
+      {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
+    </button>
+  );
+
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-[#1e3a5f] shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -102,7 +138,9 @@ const Navbar = () => {
             </div>
           )}
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            {themeToggle}
+
             {isAuthenticated ? (
               <>
                 <button
@@ -119,7 +157,7 @@ const Navbar = () => {
                   <div className="w-9 h-9 rounded-full bg-[#2563eb] text-white text-sm font-semibold flex items-center justify-center">
                     {initials}
                   </div>
-                  <span className="text-sm text-white max-w-[10rem] truncate">
+                  <span className="text-sm text-white max-w-40 truncate">
                     {displayName || 'User'}
                   </span>
                 </div>
