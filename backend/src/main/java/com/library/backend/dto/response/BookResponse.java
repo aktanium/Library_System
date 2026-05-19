@@ -21,4 +21,8 @@ public class BookResponse {
     private String isbn;
     private Integer quantity;
     private BookStatus status;
+    private String description;
+    private String summary;
+    private Integer publishedYear;
+    private String coverColor;
 }

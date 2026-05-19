@@ -15,13 +15,13 @@ const FILTERS: { label: string; value: StatusFilter }[] = [
 
 const StatusBadge = ({ status }: { status: string }) => {
   const styles: Record<string, string> = {
-    BORROWED: 'bg-amber-100 text-amber-700',
-    RETURNED: 'bg-green-100 text-green-700',
+    BORROWED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
+    RETURNED: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
   };
   return (
     <span
       className={`px-2 py-1 rounded-full text-xs font-semibold ${
-        styles[status] ?? 'bg-slate-100 text-slate-600'
+        styles[status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
       }`}
     >
       {status}
@@ -40,19 +40,19 @@ const RowSkeleton = () => (
   <tr className="animate-pulse">
     <td className="px-4 py-3">
       <div className="space-y-2">
-        <div className="h-4 w-32 bg-slate-200 rounded" />
-        <div className="h-3 w-40 bg-slate-200 rounded" />
+        <div className="h-4 w-32 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-3 w-40 bg-slate-200 dark:bg-slate-700 rounded" />
       </div>
     </td>
     <td className="px-4 py-3">
       <div className="space-y-2">
-        <div className="h-4 w-44 bg-slate-200 rounded" />
-        <div className="h-3 w-28 bg-slate-200 rounded" />
+        <div className="h-4 w-44 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-3 w-28 bg-slate-200 dark:bg-slate-700 rounded" />
       </div>
     </td>
-    <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-6 w-20 bg-slate-200 rounded-full" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full" /></td>
   </tr>
 );
 
@@ -97,15 +97,15 @@ const AllBorrowsPage = () => {
     records.length === 0 ? 'No borrow records yet.' : `No ${statusFilter.toLowerCase()} records.`;
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#0f172a]">All Borrows</h1>
-          <p className="text-slate-600 mt-1 text-sm">Complete borrowing history</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">All Borrows</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">Complete borrowing history</p>
         </div>
 
         <div className="mb-6 flex items-center justify-between gap-4 flex-wrap">
-          <div className="inline-flex bg-slate-100 rounded-lg p-1" role="tablist">
+          <div className="inline-flex bg-slate-100 dark:bg-slate-800 rounded-lg p-1" role="tablist">
             {FILTERS.map((f) => {
               const active = statusFilter === f.value;
               return (
@@ -116,7 +116,9 @@ const AllBorrowsPage = () => {
                   aria-selected={active}
                   onClick={() => setStatusFilter(f.value)}
                   className={`px-4 py-1.5 rounded-md text-sm font-semibold transition-colors ${
-                    active ? 'bg-white text-slate-900 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                    active
+                      ? 'bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 shadow-sm'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-slate-100'
                   }`}
                 >
                   {f.label}
@@ -125,18 +127,18 @@ const AllBorrowsPage = () => {
             })}
           </div>
           {!loading && records.length > 0 && (
-            <p className="text-sm text-slate-500">
-              <span className="font-semibold text-slate-900">{filtered.length}</span> of {records.length}{' '}
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              <span className="font-semibold text-slate-900 dark:text-slate-100">{filtered.length}</span> of {records.length}{' '}
               {records.length === 1 ? 'record' : 'records'}
             </p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase text-xs tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                   <th className="px-4 py-3 text-left">User</th>
                   <th className="px-4 py-3 text-left">Book</th>
                   <th className="px-4 py-3 text-left">Borrow Date</th>
@@ -144,28 +146,28 @@ const AllBorrowsPage = () => {
                   <th className="px-4 py-3 text-left">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => <RowSkeleton key={i} />)
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
+                    <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                       {emptyMessage}
                     </td>
                   </tr>
                 ) : (
                   visible.map((r) => (
-                    <tr key={r.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-900">{r.userFullName}</div>
-                        <div className="text-xs text-slate-500">{r.userEmail}</div>
+                        <div className="font-medium text-slate-900 dark:text-slate-100">{r.userFullName}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400">{r.userEmail}</div>
                       </td>
                       <td className="px-4 py-3">
-                        <div className="font-medium text-slate-900">{r.bookTitle}</div>
-                        <div className="text-xs text-slate-500 font-mono">{r.bookIsbn}</div>
+                        <div className="font-medium text-slate-900 dark:text-slate-100">{r.bookTitle}</div>
+                        <div className="text-xs text-slate-500 dark:text-slate-400 font-mono">{r.bookIsbn}</div>
                       </td>
-                      <td className="px-4 py-3 text-slate-700">{formatDate(r.borrowDate)}</td>
-                      <td className="px-4 py-3 text-slate-700">{formatDate(r.returnDate)}</td>
+                      <td className="px-4 py-3 text-slate-700 dark:text-slate-200">{formatDate(r.borrowDate)}</td>
+                      <td className="px-4 py-3 text-slate-700 dark:text-slate-200">{formatDate(r.returnDate)}</td>
                       <td className="px-4 py-3"><StatusBadge status={r.status} /></td>
                     </tr>
                   ))
@@ -175,14 +177,14 @@ const AllBorrowsPage = () => {
           </div>
 
           {!loading && total > 0 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-              <span className="text-sm text-slate-500">Showing {start + 1}–{end} of {total} results</span>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-sm text-slate-500 dark:text-slate-400">Showing {start + 1}–{end} of {total} results</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
                 </button>
@@ -190,7 +192,7 @@ const AllBorrowsPage = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
                   disabled={page === lastPage}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                 </button>

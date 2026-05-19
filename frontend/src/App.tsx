@@ -6,6 +6,7 @@ import RegisterPage from './pages/RegisterPage';
 import ProfilePage from './pages/ProfilePage';
 import BooksPage from './features/books/pages/BooksPage';
 import BorrowHistoryPage from './features/borrow/pages/BorrowHistoryPage';
+import WishlistPage from './features/wishlist/pages/WishlistPage';
 import DashboardPage from './features/admin/pages/DashboardPage';
 import UsersPage from './features/admin/pages/UsersPage';
 import AdminBooksPage from './features/admin/pages/AdminBooksPage';
@@ -27,6 +28,7 @@ function App() {
             <Route path="/books" element={<BooksPage />} />
             <Route path="/borrow" element={<BorrowHistoryPage />} />
             <Route path="/profile" element={<ProfilePage />} />
+            <Route path="/wishlist" element={<WishlistPage />} />
           </Route>
 
           <Route element={<ProtectedRoute requireAdmin />}>

@@ -74,6 +74,20 @@ const UsersIcon = () => (
   </svg>
 );
 
+const AlertIcon = () => (
+  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+      d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+  </svg>
+);
+
+const formatDate = (dateStr: string | null | undefined) => {
+  if (!dateStr) return '—';
+  const d = new Date(dateStr);
+  if (Number.isNaN(d.getTime())) return '—';
+  return d.toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' });
+};
+
 const buildLast6Months = (records: BorrowRecordResponse[]) => {
   const months: { month: string; count: number; key: string }[] = [];
   const now = new Date();
@@ -111,6 +125,8 @@ const DashboardPage = () => {
     const fetchStats = async () => {
       try {
         const result = await adminApi.getDashboard();
+        // eslint-disable-next-line no-console
+        console.log('dashboard:', result);
         if (!cancelled) setData(result);
       } catch (err: any) {
         if (cancelled) return;
@@ -145,13 +161,19 @@ const DashboardPage = () => {
 
   const monthlyData = useMemo(() => buildLast6Months(allBorrows), [allBorrows]);
 
-  const pieData = useMemo(
-    () => [
-      { name: 'Available', value: data?.availableBooks ?? 0 },
-      { name: 'Borrowed', value: data?.borrowedBooks ?? 0 },
-    ],
-    [data]
-  );
+  const pieData = useMemo(() => {
+    const d = data as Record<string, number> | null;
+    return [
+      {
+        name: 'Available',
+        value: d?.availableBooks ?? d?.available ?? d?.availableBooksCount ?? 0,
+      },
+      {
+        name: 'Borrowed',
+        value: d?.borrowedBooks ?? d?.borrowed ?? d?.borrowedBooksCount ?? 0,
+      },
+    ].filter((slice) => slice.value > 0);
+  }, [data]);
 
   const totalPieValue = pieData.reduce((sum, slice) => sum + slice.value, 0);
 
@@ -163,38 +185,45 @@ const DashboardPage = () => {
           <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">System overview and key metrics</p>
         </div>
 
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-6">
           {loading ? (
-            Array.from({ length: 4 }).map((_, i) => <StatCardSkeleton key={i} />)
+            Array.from({ length: 5 }).map((_, i) => <StatCardSkeleton key={i} />)
           ) : (
             <>
               <StatCard
                 title="Total Books"
-                value={data?.totalBooks ?? 0}
+                value={Number(data?.totalBooks ?? 0)}
                 icon={<BookIcon />}
                 iconBg="bg-indigo-100 dark:bg-indigo-900/40"
                 iconColor="text-indigo-600 dark:text-indigo-300"
               />
               <StatCard
-                title="Available Books"
-                value={data?.availableBooks ?? 0}
+                title="Available"
+                value={Number(data?.availableBooks ?? 0)}
                 icon={<CheckCircleIcon />}
                 iconBg="bg-green-100 dark:bg-green-900/40"
                 iconColor="text-green-600 dark:text-green-300"
               />
               <StatCard
-                title="Borrowed Books"
-                value={data?.borrowedBooks ?? 0}
+                title="Borrowed"
+                value={Number(data?.borrowedBooks ?? 0)}
                 icon={<BookmarkIcon />}
                 iconBg="bg-amber-100 dark:bg-amber-900/40"
                 iconColor="text-amber-600 dark:text-amber-300"
               />
               <StatCard
                 title="Total Users"
-                value={data?.totalUsers ?? 0}
+                value={Number(data?.totalUsers ?? 0)}
                 icon={<UsersIcon />}
                 iconBg="bg-purple-100 dark:bg-purple-900/40"
                 iconColor="text-purple-600 dark:text-purple-300"
+              />
+              <StatCard
+                title="Overdue"
+                value={Number(data?.overdueCount ?? 0)}
+                icon={<AlertIcon />}
+                iconBg="bg-red-100 dark:bg-red-900/40"
+                iconColor="text-red-600 dark:text-red-300"
               />
             </>
           )}
@@ -284,6 +313,58 @@ const DashboardPage = () => {
               )}
             </div>
           </div>
+        </div>
+
+        <div className="mt-8 bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
+          <div className="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+            <h3 className="text-base font-semibold text-slate-900 dark:text-slate-100">Recent Activity</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Last 5 borrow records</p>
+          </div>
+          {chartsLoading ? (
+            <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Loading…</div>
+          ) : borrowsError ? (
+            <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">Recent activity unavailable.</div>
+          ) : allBorrows.length === 0 ? (
+            <div className="p-6 text-center text-sm text-slate-500 dark:text-slate-400">No borrow records yet.</div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
+                    <th className="px-4 py-2 text-left">User</th>
+                    <th className="px-4 py-2 text-left">Book</th>
+                    <th className="px-4 py-2 text-left">Borrowed</th>
+                    <th className="px-4 py-2 text-left">Returned</th>
+                    <th className="px-4 py-2 text-left">Status</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
+                  {[...allBorrows]
+                    .sort((a, b) => new Date(b.borrowDate).getTime() - new Date(a.borrowDate).getTime())
+                    .slice(0, 5)
+                    .map((r) => (
+                      <tr key={r.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
+                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{r.userFullName}</td>
+                        <td className="px-4 py-3 text-slate-700 dark:text-slate-200">{r.bookTitle}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{formatDate(r.borrowDate)}</td>
+                        <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{formatDate(r.returnDate)}</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${
+                              r.status === 'BORROWED'
+                                ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'
+                                : 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300'
+                            }`}
+                          >
+                            {r.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </div>

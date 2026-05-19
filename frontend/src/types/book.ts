@@ -6,4 +6,8 @@ export interface Book {
   isbn: string;
   quantity: number;
   status: string;
+  description?: string | null;
+  summary?: string | null;
+  publishedYear?: number | null;
+  coverColor?: string | null;
 }

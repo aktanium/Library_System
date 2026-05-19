@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -30,15 +31,21 @@ public class AdminService {
     private final UserMapper userMapper;
     private final BorrowRecordMapper borrowRecordMapper;
 
+    private static final int OVERDUE_DAYS = 14;
+
     @Transactional(readOnly = true)
     public DashboardResponse getDashboard() {
+        long totalBooks = bookRepository.count();
+        long availableBooks = bookRepository.countByStatus(BookStatus.AVAILABLE);
+        // Method B: active borrow records — robust to multi-copy books where Book.status stays AVAILABLE
+        long borrowedBooks = borrowRecordRepository.countByStatus(BorrowStatus.BORROWED);
+        long overdueCount = borrowRecordRepository.countOverdue(LocalDateTime.now().minusDays(OVERDUE_DAYS));
         return DashboardResponse.builder()
-                .totalBooks(bookRepository.count())
-                .availableBooks(bookRepository.countByStatus(BookStatus.AVAILABLE))
-                .borrowedBooks(bookRepository.countByStatus(BookStatus.BORROWED))
+                .totalBooks(totalBooks)
+                .availableBooks(availableBooks)
+                .borrowedBooks(borrowedBooks)
                 .totalUsers(userRepository.count())
-                .activeBorrowRecords(borrowRecordRepository.countByStatus(BorrowStatus.BORROWED))
-                .returnedBorrowRecords(borrowRecordRepository.countByStatus(BorrowStatus.RETURNED))
+                .overdueCount(overdueCount)
                 .build();
     }
 

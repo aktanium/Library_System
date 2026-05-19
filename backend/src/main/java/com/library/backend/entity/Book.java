@@ -34,4 +34,15 @@ public class Book {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private BookStatus status;
+
+    @Column(columnDefinition = "TEXT")
+    private String description;
+
+    @Column(columnDefinition = "TEXT")
+    private String summary;
+
+    private Integer publishedYear;
+
+    /** Hex color string (e.g. "#4f46e5") used by the frontend to render a generated cover. */
+    private String coverColor;
 }

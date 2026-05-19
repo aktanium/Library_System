@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { useTheme } from '../../context/ThemeContext';
+import NotificationBell from '../../features/notifications/components/NotificationBell';
 
 const decodePayload = (): { sub?: string; role?: string } | null => {
   try {
@@ -84,6 +85,9 @@ const Navbar = () => {
       <NavLink to="/borrow" onClick={() => setMobileOpen(false)} className={navLinkClass}>
         My Borrowings
       </NavLink>
+      <NavLink to="/wishlist" onClick={() => setMobileOpen(false)} className={navLinkClass}>
+        Wishlist
+      </NavLink>
       <NavLink to="/profile" onClick={() => setMobileOpen(false)} className={navLinkClass}>
         Profile
       </NavLink>
@@ -140,6 +144,7 @@ const Navbar = () => {
 
           <div className="flex items-center gap-2">
             {themeToggle}
+            <NotificationBell />
 
             {isAuthenticated ? (
               <>

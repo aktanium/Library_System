@@ -7,6 +7,10 @@ export interface BookRequest {
   genre: string;
   isbn: string;
   quantity: number;
+  description?: string;
+  summary?: string;
+  publishedYear?: number | null;
+  coverColor?: string;
 }
 
 export const bookAdminApi = {

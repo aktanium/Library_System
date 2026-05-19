@@ -17,6 +17,5 @@ public class DashboardResponse {
     private long availableBooks;
     private long borrowedBooks;
     private long totalUsers;
-    private long activeBorrowRecords;
-    private long returnedBorrowRecords;
+    private long overdueCount;
 }

@@ -19,6 +19,7 @@ public class BorrowRecordResponse {
     private Long id;
     private String userFullName;
     private String userEmail;
+    private Long bookId;
     private String bookTitle;
     private String bookIsbn;
     private LocalDateTime borrowDate;

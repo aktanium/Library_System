@@ -18,6 +18,10 @@ public class BookMapper {
                 .isbn(book.getIsbn())
                 .quantity(book.getQuantity())
                 .status(book.getStatus())
+                .description(book.getDescription())
+                .summary(book.getSummary())
+                .publishedYear(book.getPublishedYear())
+                .coverColor(book.getCoverColor())
                 .build();
     }
 
@@ -29,6 +33,10 @@ public class BookMapper {
                 .isbn(request.getIsbn())
                 .quantity(request.getQuantity())
                 .status(request.getQuantity() > 0 ? BookStatus.AVAILABLE : BookStatus.BORROWED)
+                .description(request.getDescription())
+                .summary(request.getSummary())
+                .publishedYear(request.getPublishedYear())
+                .coverColor(request.getCoverColor())
                 .build();
     }
 
@@ -39,5 +47,9 @@ public class BookMapper {
         book.setIsbn(request.getIsbn());
         book.setQuantity(request.getQuantity());
         book.setStatus(request.getQuantity() > 0 ? BookStatus.AVAILABLE : BookStatus.BORROWED);
+        book.setDescription(request.getDescription());
+        book.setSummary(request.getSummary());
+        book.setPublishedYear(request.getPublishedYear());
+        book.setCoverColor(request.getCoverColor());
     }
 }

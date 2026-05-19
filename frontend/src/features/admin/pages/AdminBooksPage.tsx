@@ -10,13 +10,13 @@ const PAGE_SIZE = 10;
 
 const StatusBadge = ({ status }: { status: string }) => {
   const styles: Record<string, string> = {
-    AVAILABLE: 'bg-green-100 text-green-700',
-    BORROWED: 'bg-amber-100 text-amber-700',
+    AVAILABLE: 'bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300',
+    BORROWED: 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300',
   };
   return (
     <span
       className={`px-2 py-1 rounded-full text-xs font-semibold ${
-        styles[status] ?? 'bg-slate-100 text-slate-600'
+        styles[status] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
       }`}
     >
       {status}
@@ -26,17 +26,17 @@ const StatusBadge = ({ status }: { status: string }) => {
 
 const RowSkeleton = () => (
   <tr className="animate-pulse">
-    <td className="px-4 py-3"><div className="h-4 w-6 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-28 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-20 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-28 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-8 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-6 w-20 bg-slate-200 rounded-full" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-6 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-28 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-28 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-8 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full" /></td>
     <td className="px-4 py-3">
       <div className="flex gap-2 justify-end">
-        <div className="h-8 w-8 bg-slate-200 rounded" />
-        <div className="h-8 w-8 bg-slate-200 rounded" />
+        <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded" />
       </div>
     </td>
   </tr>
@@ -166,12 +166,12 @@ const AdminBooksPage = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
           <div>
-            <h1 className="text-2xl font-bold text-[#0f172a]">Book Catalog</h1>
-            <p className="text-slate-600 mt-1 text-sm">Manage your library collection</p>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Book Catalog</h1>
+            <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">Manage your library collection</p>
           </div>
           <button
             type="button"
@@ -182,7 +182,7 @@ const AdminBooksPage = () => {
           </button>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 mb-6 p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6 p-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -199,7 +199,7 @@ const AdminBooksPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search title, author, genre, ISBN…"
-              className="w-full pl-10 pr-10 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
+              className="w-full pl-10 pr-10 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
             />
             {searchTerm && (
               <button
@@ -215,43 +215,47 @@ const AdminBooksPage = () => {
             )}
           </div>
           {searching && !loading && (
-            <p className="mt-2 text-xs text-slate-500">Searching…</p>
+            <p className="mt-2 text-xs text-slate-500 dark:text-slate-400">Searching…</p>
           )}
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase text-xs tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                   <th className="px-4 py-3 text-left w-12">#</th>
                   <th className="px-4 py-3 text-left">Title</th>
                   <th className="px-4 py-3 text-left">Author</th>
+                  <th className="px-4 py-3 text-left">Description</th>
                   <th className="px-4 py-3 text-left">Genre</th>
-                  <th className="px-4 py-3 text-left">ISBN</th>
                   <th className="px-4 py-3 text-left">Qty</th>
                   <th className="px-4 py-3 text-left">Status</th>
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {isPending ? (
                   Array.from({ length: 5 }).map((_, i) => <RowSkeleton key={i} />)
                 ) : visible.length === 0 ? (
                   <tr>
-                    <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500">
+                    <td colSpan={8} className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                       {searchTerm ? 'No books match your search.' : 'No books in the catalog.'}
                     </td>
                   </tr>
                 ) : (
                   visible.map((book, idx) => (
-                    <tr key={book.id} className="hover:bg-slate-50 transition-colors">
-                      <td className="px-4 py-3 text-slate-500">{start + idx + 1}</td>
-                      <td className="px-4 py-3 font-medium text-slate-900">{book.title}</td>
-                      <td className="px-4 py-3 text-slate-600">{book.author}</td>
-                      <td className="px-4 py-3 text-slate-600">{book.genre}</td>
-                      <td className="px-4 py-3 text-slate-500 font-mono text-xs">{book.isbn}</td>
-                      <td className="px-4 py-3 text-slate-900 font-semibold">{book.quantity}</td>
+                    <tr key={book.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400">{start + idx + 1}</td>
+                      <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{book.title}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{book.author}</td>
+                      <td className="px-4 py-3 text-slate-500 dark:text-slate-400 max-w-xs">
+                        <span className="block truncate" title={book.description ?? ''}>
+                          {book.description || <span className="italic text-slate-400 dark:text-slate-500">—</span>}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{book.genre}</td>
+                      <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-semibold">{book.quantity}</td>
                       <td className="px-4 py-3"><StatusBadge status={book.status} /></td>
                       <td className="px-4 py-3">
                         <div className="flex justify-end gap-2">
@@ -260,7 +264,7 @@ const AdminBooksPage = () => {
                             disabled={actionLoading === book.id}
                             aria-label="Edit"
                             title="Edit"
-                            className="p-2 rounded-md text-[#2563eb] hover:bg-blue-50 disabled:opacity-50 transition-colors"
+                            className="p-2 rounded-md text-[#2563eb] dark:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/40 disabled:opacity-50 transition-colors"
                           >
                             <EditIcon />
                           </button>
@@ -269,7 +273,7 @@ const AdminBooksPage = () => {
                             disabled={actionLoading === book.id}
                             aria-label="Delete"
                             title="Delete"
-                            className="p-2 rounded-md text-[#dc2626] hover:bg-red-50 disabled:opacity-50 transition-colors"
+                            className="p-2 rounded-md text-[#dc2626] dark:text-red-300 hover:bg-red-50 dark:hover:bg-red-950/40 disabled:opacity-50 transition-colors"
                           >
                             <TrashIcon />
                           </button>
@@ -283,14 +287,14 @@ const AdminBooksPage = () => {
           </div>
 
           {!isPending && total > 0 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-              <span className="text-sm text-slate-500">Showing {start + 1}–{end} of {total} results</span>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-sm text-slate-500 dark:text-slate-400">Showing {start + 1}–{end} of {total} results</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
                 </button>
@@ -298,7 +302,7 @@ const AdminBooksPage = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
                   disabled={page === lastPage}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                 </button>

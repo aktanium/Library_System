@@ -1,5 +1,6 @@
 export interface BorrowRecordResponse {
   id: number;
+  bookId: number;
   bookTitle: string;
   bookIsbn: string;
   userFullName: string;

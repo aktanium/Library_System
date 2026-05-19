@@ -126,7 +126,8 @@ Library_System/
 │   └── vite.config.ts
 └── README.md
 ```
+.\apache-maven-3.9.6\bin\mvn spring-boot:run "-Dspring-boot.run.profiles=dev"
+
 
 ## Author
-
-[Your Name] — [University Name] — [Year]
+Keneshov Aktan

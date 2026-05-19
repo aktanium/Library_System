@@ -3,8 +3,7 @@ export interface DashboardData {
   availableBooks: number;
   borrowedBooks: number;
   totalUsers: number;
-  activeBorrowRecords: number;
-  returnedBorrowRecords: number;
+  overdueCount: number;
 }
 
 export interface User {

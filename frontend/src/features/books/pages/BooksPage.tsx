@@ -1,6 +1,11 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { bookApi } from '../api/bookApi';
 import { borrowApi } from '../../borrow/api/borrowApi';
+import { wishlistApi } from '../../wishlist/api/wishlistApi';
+import { reviewApi } from '../../reviews/api/reviewApi';
+// borrowApi is also used for borrow history lookup
+import type { BookRatingStats } from '../../reviews/api/reviewApi';
+import BookDetailModal from '../components/BookDetailModal';
 import type { Book } from '../../../types/book';
 import { useToast } from '../../../hooks/useToast';
 import { useAuth } from '../../../hooks/useAuth';
@@ -23,15 +28,39 @@ const StatusBadge = ({ status }: { status: string }) => {
   );
 };
 
+const RatingCell = ({ stats }: { stats?: BookRatingStats }) => {
+  if (!stats || stats.count === 0) {
+    return <span className="text-slate-300 dark:text-slate-500 text-xs">No reviews</span>;
+  }
+  const rounded = Math.round(stats.average);
+  return (
+    <span className="flex items-center gap-1">
+      <span className="text-amber-400">
+        {'★'.repeat(rounded)}
+        {'☆'.repeat(Math.max(0, 5 - rounded))}
+      </span>
+      <span className="text-xs text-slate-500 dark:text-slate-400">
+        {stats.average.toFixed(1)} ({stats.count})
+      </span>
+    </span>
+  );
+};
+
 const RowSkeleton = () => (
   <tr className="animate-pulse">
     <td className="px-4 py-3"><div className="h-4 w-6 bg-slate-200 dark:bg-slate-700 rounded" /></td>
     <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded" /></td>
     <td className="px-4 py-3"><div className="h-4 w-28 bg-slate-200 dark:bg-slate-700 rounded" /></td>
     <td className="px-4 py-3"><div className="h-4 w-20 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-24 bg-slate-200 dark:bg-slate-700 rounded" /></td>
     <td className="px-4 py-3"><div className="h-4 w-8 bg-slate-200 dark:bg-slate-700 rounded" /></td>
     <td className="px-4 py-3"><div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full" /></td>
-    <td className="px-4 py-3"><div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded ml-auto" /></td>
+    <td className="px-4 py-3">
+      <div className="flex gap-2 justify-end">
+        <div className="h-8 w-8 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-8 w-20 bg-slate-200 dark:bg-slate-700 rounded" />
+      </div>
+    </td>
   </tr>
 );
 
@@ -39,10 +68,6 @@ const CardSkeleton = () => (
   <div className="animate-pulse bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 space-y-3">
     <div className="h-5 w-3/4 bg-slate-200 dark:bg-slate-700 rounded" />
     <div className="h-3 w-1/2 bg-slate-200 dark:bg-slate-700 rounded" />
-    <div className="flex gap-2">
-      <div className="h-6 w-20 bg-slate-200 dark:bg-slate-700 rounded-full" />
-      <div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded-full" />
-    </div>
     <div className="h-8 w-full bg-slate-200 dark:bg-slate-700 rounded" />
   </div>
 );
@@ -74,6 +99,13 @@ const BooksPage = () => {
   const [searching, setSearching] = useState(false);
   const [page, setPage] = useState(1);
   const [borrowingId, setBorrowingId] = useState<number | null>(null);
+
+  const [wishlistIds, setWishlistIds] = useState<Set<number>>(new Set());
+  const [wishlistToggling, setWishlistToggling] = useState<number | null>(null);
+  const [ratings, setRatings] = useState<Record<number, BookRatingStats>>({});
+  const [returnedBookIds, setReturnedBookIds] = useState<Set<number>>(new Set());
+  const [selectedBook, setSelectedBook] = useState<Book | null>(null);
+
   const { isAuthenticated } = useAuth();
   const { showToast } = useToast();
 
@@ -110,6 +142,65 @@ const BooksPage = () => {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
+  // Wishlist + ratings + borrow history — Promise.allSettled so a single failed endpoint
+  // doesn't break the others. History is what unlocks "Write a review" in the detail modal.
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setWishlistIds(new Set());
+      setReturnedBookIds(new Set());
+      return;
+    }
+    let cancelled = false;
+
+    const fetchAux = async () => {
+      const [booksResult, wishlistResult, ratingsResult, historyResult] = await Promise.allSettled([
+        bookApi.getAllBooks(),
+        wishlistApi.getMyWishlist(),
+        reviewApi.getAllAverages(),
+        borrowApi.getMyBorrowHistory(),
+      ]);
+      if (cancelled) return;
+      if (booksResult.status === 'fulfilled' && !searchTerm.trim()) {
+        setBooks(booksResult.value);
+      }
+      if (wishlistResult.status === 'fulfilled') {
+        setWishlistIds(new Set(wishlistResult.value.map((w) => w.bookId)));
+      }
+      if (ratingsResult.status === 'fulfilled') {
+        setRatings(ratingsResult.value);
+      }
+      if (historyResult.status === 'fulfilled') {
+        const returned = historyResult.value
+          .filter((r) => r.status === 'RETURNED' && typeof r.bookId === 'number')
+          .map((r) => r.bookId as number);
+        setReturnedBookIds(new Set(returned));
+      }
+    };
+
+    fetchAux();
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isAuthenticated]);
+
+  // Public ratings — even unauthenticated visitors should see stars on the catalog
+  useEffect(() => {
+    if (isAuthenticated) return;
+    let cancelled = false;
+    reviewApi
+      .getAllAverages()
+      .then((res) => {
+        if (!cancelled) setRatings(res);
+      })
+      .catch(() => {
+        /* leave empty */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
+
   useEffect(() => {
     setPage(1);
   }, [books.length]);
@@ -119,7 +210,7 @@ const BooksPage = () => {
   const lastPage = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const start = (page - 1) * PAGE_SIZE;
   const end = Math.min(start + PAGE_SIZE, total);
-  const visible = books.slice(start, end);
+  const visible = useMemo(() => books.slice(start, end), [books, start, end]);
   const isPending = loading || searching;
 
   const handleBorrow = async (book: Book) => {
@@ -136,11 +227,54 @@ const BooksPage = () => {
     }
   };
 
+  const toggleWishlist = async (book: Book) => {
+    if (!isAuthenticated) {
+      showToast('Sign in to use wishlist', 'error');
+      return;
+    }
+    const isIn = wishlistIds.has(book.id);
+
+    // Optimistic update first — UI flips immediately
+    setWishlistIds((prev) => {
+      const next = new Set(prev);
+      if (isIn) next.delete(book.id);
+      else next.add(book.id);
+      return next;
+    });
+
+    try {
+      setWishlistToggling(book.id);
+      if (isIn) {
+        await wishlistApi.removeFromWishlist(book.id);
+        showToast('Removed from wishlist', 'success');
+      } else {
+        await wishlistApi.addToWishlist(book.id);
+        showToast('Added to wishlist!', 'success');
+      }
+    } catch (err: any) {
+      // Revert
+      setWishlistIds((prev) => {
+        const next = new Set(prev);
+        if (isIn) next.add(book.id);
+        else next.delete(book.id);
+        return next;
+      });
+      showToast(err?.response?.data?.message || 'Failed to update wishlist', 'error');
+    } finally {
+      setWishlistToggling(null);
+    }
+  };
+
   const borrowButtonClass = (disabled: boolean) =>
     `inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold transition-colors ${
       disabled
         ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 dark:text-slate-500 cursor-not-allowed'
         : 'text-white bg-[#2563eb] hover:bg-blue-700 disabled:opacity-50'
+    }`;
+
+  const bookmarkButtonClass = (saved: boolean) =>
+    `p-1.5 rounded transition-colors disabled:opacity-50 ${
+      saved ? 'text-amber-400 hover:text-amber-500' : 'text-slate-300 hover:text-slate-400'
     }`;
 
   return (
@@ -192,13 +326,14 @@ const BooksPage = () => {
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
-                  <th scope="col" className="px-4 py-3 text-left w-12">#</th>
-                  <th scope="col" className="px-4 py-3 text-left">Title</th>
-                  <th scope="col" className="px-4 py-3 text-left">Author</th>
-                  <th scope="col" className="px-4 py-3 text-left">Genre</th>
-                  <th scope="col" className="px-4 py-3 text-left">Qty</th>
-                  <th scope="col" className="px-4 py-3 text-left">Status</th>
-                  <th scope="col" className="px-4 py-3 text-right">Action</th>
+                  <th className="px-4 py-3 text-left w-12">#</th>
+                  <th className="px-4 py-3 text-left">Title</th>
+                  <th className="px-4 py-3 text-left">Author</th>
+                  <th className="px-4 py-3 text-left">Genre</th>
+                  <th className="px-4 py-3 text-left">Rating</th>
+                  <th className="px-4 py-3 text-left">Qty</th>
+                  <th className="px-4 py-3 text-left">Status</th>
+                  <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
@@ -206,7 +341,7 @@ const BooksPage = () => {
                   Array.from({ length: 8 }).map((_, i) => <RowSkeleton key={i} />)
                 ) : visible.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-0">
+                    <td colSpan={8} className="px-4 py-0">
                       <EmptyMessage
                         message={searchTerm ? 'No books match your search.' : 'No books found.'}
                       />
@@ -215,6 +350,7 @@ const BooksPage = () => {
                 ) : (
                   visible.map((book, idx) => {
                     const disabled = book.status !== 'AVAILABLE';
+                    const saved = wishlistIds.has(book.id);
                     return (
                       <tr
                         key={book.id}
@@ -223,25 +359,48 @@ const BooksPage = () => {
                         <td className="px-4 py-3 text-slate-500 dark:text-slate-400">
                           {start + idx + 1}
                         </td>
-                        <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">
-                          {book.title}
+                        <td className="px-4 py-3">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedBook(book)}
+                            className="font-medium text-slate-900 dark:text-slate-100 hover:text-[#2563eb] dark:hover:text-blue-400 text-left underline-offset-2 hover:underline"
+                          >
+                            {book.title}
+                          </button>
                         </td>
                         <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{book.author}</td>
                         <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{book.genre}</td>
+                        <td className="px-4 py-3"><RatingCell stats={ratings[book.id]} /></td>
                         <td className="px-4 py-3 text-slate-900 dark:text-slate-100 font-semibold">
                           {book.quantity}
                         </td>
                         <td className="px-4 py-3"><StatusBadge status={book.status} /></td>
                         <td className="px-4 py-3 text-right">
-                          {isAuthenticated ? (
-                            <button
-                              onClick={() => handleBorrow(book)}
-                              disabled={disabled || borrowingId === book.id}
-                              className={borrowButtonClass(disabled)}
-                            >
-                              {borrowingId === book.id ? 'Borrowing…' : 'Borrow'}
-                            </button>
-                          ) : null}
+                          <div className="flex items-center justify-end gap-2">
+                            {isAuthenticated && (
+                              <button
+                                type="button"
+                                onClick={() => toggleWishlist(book)}
+                                disabled={wishlistToggling === book.id}
+                                aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+                                title={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+                                className={bookmarkButtonClass(saved)}
+                              >
+                                <span aria-hidden="true" className="text-lg leading-none">
+                                  {saved ? '🔖' : '🏷️'}
+                                </span>
+                              </button>
+                            )}
+                            {isAuthenticated && (
+                              <button
+                                onClick={() => handleBorrow(book)}
+                                disabled={disabled || borrowingId === book.id}
+                                className={borrowButtonClass(disabled)}
+                              >
+                                {borrowingId === book.id ? 'Borrowing…' : 'Borrow'}
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -292,13 +451,37 @@ const BooksPage = () => {
             <>
               {visible.map((book) => {
                 const disabled = book.status !== 'AVAILABLE';
+                const saved = wishlistIds.has(book.id);
                 return (
                   <div
                     key={book.id}
                     className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg p-4 shadow-sm"
                   >
-                    <h3 className="font-semibold text-slate-900 dark:text-slate-100">{book.title}</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">{book.author}</p>
+                    <div className="flex items-start justify-between gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setSelectedBook(book)}
+                        className="flex-1 min-w-0 text-left"
+                      >
+                        <h3 className="font-semibold text-slate-900 dark:text-slate-100 hover:text-[#2563eb] dark:hover:text-blue-400">
+                          {book.title}
+                        </h3>
+                        <p className="text-sm text-slate-600 dark:text-slate-300 mt-0.5">{book.author}</p>
+                      </button>
+                      {isAuthenticated && (
+                        <button
+                          type="button"
+                          onClick={() => toggleWishlist(book)}
+                          disabled={wishlistToggling === book.id}
+                          aria-label={saved ? 'Remove from wishlist' : 'Add to wishlist'}
+                          className={bookmarkButtonClass(saved)}
+                        >
+                          <span aria-hidden="true" className="text-lg leading-none">
+                            {saved ? '🔖' : '🏷️'}
+                          </span>
+                        </button>
+                      )}
+                    </div>
                     <div className="mt-3 flex flex-wrap items-center gap-2">
                       <span className="px-2 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-200">
                         {book.genre}
@@ -308,12 +491,13 @@ const BooksPage = () => {
                         Qty: <span className="font-semibold text-slate-700 dark:text-slate-200">{book.quantity}</span>
                       </span>
                     </div>
+                    <div className="mt-2"><RatingCell stats={ratings[book.id]} /></div>
                     <p className="mt-2 text-xs font-mono text-slate-400 dark:text-slate-500">{book.isbn}</p>
                     {isAuthenticated && (
                       <button
                         onClick={() => handleBorrow(book)}
                         disabled={disabled || borrowingId === book.id}
-                        className={`mt-3 w-full ${borrowButtonClass(disabled)} justify-center`}
+                        className={`mt-3 w-full justify-center ${borrowButtonClass(disabled)}`}
                       >
                         {borrowingId === book.id ? 'Borrowing…' : 'Borrow'}
                       </button>
@@ -351,6 +535,21 @@ const BooksPage = () => {
           )}
         </div>
       </div>
+
+      <BookDetailModal
+        book={selectedBook}
+        onClose={() => setSelectedBook(null)}
+        ratingStats={selectedBook ? ratings[selectedBook.id] : undefined}
+        inWishlist={selectedBook ? wishlistIds.has(selectedBook.id) : false}
+        onBorrow={async (b) => {
+          await handleBorrow(b);
+          setSelectedBook(null);
+        }}
+        onToggleWishlist={(b) => toggleWishlist(b)}
+        borrowing={selectedBook ? borrowingId === selectedBook.id : false}
+        wishlistToggling={selectedBook ? wishlistToggling === selectedBook.id : false}
+        canWriteReview={selectedBook ? returnedBookIds.has(selectedBook.id) : false}
+      />
     </div>
   );
 };

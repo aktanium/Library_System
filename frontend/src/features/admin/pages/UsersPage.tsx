@@ -7,14 +7,14 @@ import { useToast } from '../../../hooks/useToast';
 const PAGE_SIZE = 10;
 
 const ROLE_BADGE_STYLES: Record<string, string> = {
-  ADMIN: 'bg-purple-100 text-purple-700',
-  USER: 'bg-blue-100 text-blue-700',
+  ADMIN: 'bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300',
+  USER: 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300',
 };
 
 const RoleBadge = ({ role }: { role: string }) => (
   <span
     className={`px-2 py-1 rounded-full text-xs font-semibold ${
-      ROLE_BADGE_STYLES[role] ?? 'bg-slate-100 text-slate-600'
+      ROLE_BADGE_STYLES[role] ?? 'bg-slate-100 text-slate-600 dark:bg-slate-700 dark:text-slate-300'
     }`}
   >
     {role}
@@ -39,14 +39,14 @@ const Avatar = ({ name }: { name: string }) => (
 
 const RowSkeleton = () => (
   <tr className="animate-pulse">
-    <td className="px-4 py-3"><div className="w-9 h-9 rounded-full bg-slate-200" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-4 w-56 bg-slate-200 rounded" /></td>
-    <td className="px-4 py-3"><div className="h-6 w-16 bg-slate-200 rounded-full" /></td>
+    <td className="px-4 py-3"><div className="w-9 h-9 rounded-full bg-slate-200 dark:bg-slate-700" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-40 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-4 w-56 bg-slate-200 dark:bg-slate-700 rounded" /></td>
+    <td className="px-4 py-3"><div className="h-6 w-16 bg-slate-200 dark:bg-slate-700 rounded-full" /></td>
     <td className="px-4 py-3">
       <div className="flex gap-2 justify-end">
-        <div className="h-8 w-24 bg-slate-200 rounded" />
-        <div className="h-8 w-24 bg-slate-200 rounded" />
+        <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
+        <div className="h-8 w-24 bg-slate-200 dark:bg-slate-700 rounded" />
       </div>
     </td>
   </tr>
@@ -110,14 +110,14 @@ const UsersPage = () => {
   };
 
   return (
-    <div className="pt-16 min-h-screen bg-slate-50">
+    <div className="pt-16 min-h-screen bg-slate-50 dark:bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-6">
-          <h1 className="text-2xl font-bold text-[#0f172a]">Users</h1>
-          <p className="text-slate-600 mt-1 text-sm">Registered library members</p>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-slate-100">Users</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1 text-sm">Registered library members</p>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 mb-6 p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 mb-6 p-4">
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
               <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -134,7 +134,7 @@ const UsersPage = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               placeholder="Search by name or email…"
-              className="w-full pl-10 pr-10 py-2 border border-slate-200 rounded-lg text-sm text-slate-900 placeholder-slate-400 focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
+              className="w-full pl-10 pr-10 py-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 focus:ring-2 focus:ring-[#2563eb] focus:border-transparent outline-none transition-shadow"
             />
             {searchTerm && (
               <button
@@ -151,11 +151,11 @@ const UsersPage = () => {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-sm border border-slate-200 dark:border-slate-700 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
               <thead>
-                <tr className="bg-slate-50 text-slate-500 uppercase text-xs tracking-wider">
+                <tr className="bg-slate-50 dark:bg-slate-900/50 text-slate-500 dark:text-slate-400 uppercase text-xs tracking-wider">
                   <th className="px-4 py-3 text-left w-16"><span className="sr-only">Avatar</span></th>
                   <th className="px-4 py-3 text-left">Full Name</th>
                   <th className="px-4 py-3 text-left">Email</th>
@@ -163,34 +163,34 @@ const UsersPage = () => {
                   <th className="px-4 py-3 text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
                 {loading ? (
                   Array.from({ length: 5 }).map((_, i) => <RowSkeleton key={i} />)
                 ) : visible.length === 0 ? (
                   <tr>
-                    <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500">
+                    <td colSpan={5} className="px-4 py-10 text-center text-sm text-slate-500 dark:text-slate-400">
                       {searchTerm ? 'No users match your search.' : 'No registered users yet.'}
                     </td>
                   </tr>
                 ) : (
                   visible.map((user) => (
-                    <tr key={user.id} className="hover:bg-slate-50 transition-colors">
+                    <tr key={user.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/40 transition-colors">
                       <td className="px-4 py-3"><Avatar name={user.fullName} /></td>
-                      <td className="px-4 py-3 font-medium text-slate-900">{user.fullName}</td>
-                      <td className="px-4 py-3 text-slate-600">{user.email}</td>
+                      <td className="px-4 py-3 font-medium text-slate-900 dark:text-slate-100">{user.fullName}</td>
+                      <td className="px-4 py-3 text-slate-600 dark:text-slate-300">{user.email}</td>
                       <td className="px-4 py-3"><RoleBadge role={user.role} /></td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleChangeRole(user)}
                             disabled={actionLoading === user.id}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-[#2563eb] bg-blue-50 hover:bg-blue-100 disabled:opacity-50 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-[#2563eb] dark:text-blue-300 bg-blue-50 dark:bg-blue-950/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 disabled:opacity-50 transition-colors"
                           >
                             Change Role
                           </button>
                           <Link
                             to={`/admin/users/${user.id}/history`}
-                            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 border border-slate-200 hover:bg-slate-50 transition-colors"
+                            className="inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
                           >
                             View History
                           </Link>
@@ -204,14 +204,14 @@ const UsersPage = () => {
           </div>
 
           {!loading && total > 0 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200">
-              <span className="text-sm text-slate-500">Showing {start + 1}–{end} of {total} results</span>
+            <div className="flex items-center justify-between px-4 py-3 border-t border-slate-200 dark:border-slate-700">
+              <span className="text-sm text-slate-500 dark:text-slate-400">Showing {start + 1}–{end} of {total} results</span>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => setPage((p) => Math.max(1, p - 1))}
                   disabled={page === 1}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Previous
                 </button>
@@ -219,7 +219,7 @@ const UsersPage = () => {
                   type="button"
                   onClick={() => setPage((p) => Math.min(lastPage, p + 1))}
                   disabled={page === lastPage}
-                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 bg-white border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                  className="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                 >
                   Next
                 </button>

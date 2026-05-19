@@ -12,6 +12,7 @@ public class BorrowRecordMapper {
                 .id(record.getId())
                 .userFullName(record.getUser().getFullName())
                 .userEmail(record.getUser().getEmail())
+                .bookId(record.getBook().getId())
                 .bookTitle(record.getBook().getTitle())
                 .bookIsbn(record.getBook().getIsbn())
                 .borrowDate(record.getBorrowDate())
